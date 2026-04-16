@@ -39,8 +39,8 @@ export async function POST(request: Request) {
       name: user.name,
       role: user.role
     })
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error creating user:", error)
-    return new NextResponse("Internal Server Error", { status: 500 })
+    return new NextResponse(`Error: ${error.message || "Unknown error"}`, { status: 500 })
   }
 }
