@@ -173,12 +173,12 @@ export function BotsList() {
             className="pl-9"
           />
         </div>
-        <Select value={statusFilter || "all"} onValueChange={(value: string) => setStatusFilter(value === "all" ? "" : value)}>
+        <Select value={statusFilter || undefined} onValueChange={(value: string | null) => setStatusFilter(value || "")}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All statuses</SelectItem>
+            <SelectItem value="">All statuses</SelectItem>
             <SelectItem value="active">Active</SelectItem>
             <SelectItem value="inactive">Inactive</SelectItem>
             <SelectItem value="archived">Archived</SelectItem>
