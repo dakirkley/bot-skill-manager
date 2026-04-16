@@ -44,8 +44,8 @@ export function RegisterForm() {
       if (res.ok) {
         router.push("/login")
       } else {
-        const data = await res.json()
-        setError(data.error || "Registration failed")
+        const text = await res.text()
+        setError(text || "Registration failed")
       }
     } catch (err) {
       setError("An error occurred. Please try again.")
