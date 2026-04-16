@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Bot, Loader2 } from "lucide-react"
+import Link from "next/link"
 
 export function LoginForm() {
   const router = useRouter()
@@ -95,7 +96,10 @@ export function LoginForm() {
           </Button>
         </form>
         <p className="mt-4 text-center text-sm text-slate-600">
-          Default login: admin@example.com / admin123
+          Don&apos;t have an account?{" "}
+          <Link href="/register" className="text-blue-600 hover:underline">
+            Sign up
+          </Link>
         </p>
       </CardContent>
     </Card>
