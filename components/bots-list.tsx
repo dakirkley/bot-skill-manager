@@ -221,7 +221,7 @@ export function BotsList() {
                   <Label htmlFor="status">Status</Label>
                   <Select
                     value={formData.status}
-                    onValueChange={(value: string) => setFormData({ ...formData, status: value })}
+                    onValueChange={(value: string | null) => setFormData({ ...formData, status: value || "active" })}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -370,7 +370,7 @@ export function BotsList() {
                 <Label htmlFor="edit-status">Status</Label>
                 <Select
                   value={formData.status}
-                  onValueChange={(value: string) => setFormData({ ...formData, status: value })}
+                  onValueChange={(value: string | null) => setFormData({ ...formData, status: value || "active" })}
                 >
                   <SelectTrigger>
                     <SelectValue />
