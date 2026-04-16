@@ -1,4 +1,3 @@
-
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
@@ -6,7 +5,7 @@ import { NextResponse } from "next/server"
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions)
 
@@ -14,9 +13,11 @@ export async function GET(
     return new NextResponse("Unauthorized", { status: 401 })
   }
 
+  const { id } = await params
+
   try {
     const credential = await prisma.apiCredential.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         skillApis: {
           include: {
@@ -39,7 +40,7 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions)
 
@@ -47,12 +48,14 @@ export async function PUT(
     return new NextResponse("Unauthorized", { status: 401 })
   }
 
+  const { id } = await params
+
   try {
     const json = await request.json()
     const { name, service, keyIdentifier, expirationDate, status, notes } = json
 
     const credential = await prisma.apiCredential.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         name,
         service,
@@ -72,7 +75,7 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions)
 
@@ -80,9 +83,11 @@ export async function DELETE(
     return new NextResponse("Unauthorized", { status: 401 })
   }
 
+  const { id } = await params
+
   try {
     await prisma.apiCredential.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return new NextResponse(null, { status: 204 })

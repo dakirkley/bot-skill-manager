@@ -1,4 +1,3 @@
-
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
@@ -6,7 +5,7 @@ import { NextResponse } from "next/server"
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions)
 
@@ -14,9 +13,11 @@ export async function GET(
     return new NextResponse("Unauthorized", { status: 401 })
   }
 
+  const { id } = await params
+
   try {
     const bot = await prisma.bot.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         botSkills: {
           include: {
@@ -47,7 +48,7 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions)
 
@@ -55,12 +56,14 @@ export async function PUT(
     return new NextResponse("Unauthorized", { status: 401 })
   }
 
+  const { id } = await params
+
   try {
     const json = await request.json()
     const { name, description, status, skillIds } = json
 
     const bot = await prisma.bot.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         name,
         description,
@@ -70,13 +73,13 @@ export async function PUT(
 
     if (skillIds !== undefined) {
       await prisma.botSkill.deleteMany({
-        where: { botId: params.id }
+        where: { botId: id }
       })
 
       if (skillIds.length > 0) {
         await prisma.botSkill.createMany({
           data: skillIds.map((skillId: string) => ({
-            botId: params.id,
+            botId: id,
             skillId
           }))
         })
@@ -84,7 +87,7 @@ export async function PUT(
     }
 
     const botWithSkills = await prisma.bot.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         botSkills: {
           include: {
@@ -103,7 +106,7 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions)
 
@@ -111,9 +114,11 @@ export async function DELETE(
     return new NextResponse("Unauthorized", { status: 401 })
   }
 
+  const { id } = await params
+
   try {
     await prisma.bot.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return new NextResponse(null, { status: 204 })

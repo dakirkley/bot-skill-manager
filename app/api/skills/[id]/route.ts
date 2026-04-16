@@ -1,4 +1,3 @@
-
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
@@ -6,7 +5,7 @@ import { NextResponse } from "next/server"
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions)
 
@@ -14,9 +13,11 @@ export async function GET(
     return new NextResponse("Unauthorized", { status: 401 })
   }
 
+  const { id } = await params
+
   try {
     const skill = await prisma.skill.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         botSkills: {
           include: {
@@ -44,7 +45,7 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions)
 
@@ -52,12 +53,14 @@ export async function PUT(
     return new NextResponse("Unauthorized", { status: 401 })
   }
 
+  const { id } = await params
+
   try {
     const json = await request.json()
     const { name, description, version, installPath, documentationUrl, commands, apiIds } = json
 
     const skill = await prisma.skill.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         name,
         description,
@@ -70,13 +73,13 @@ export async function PUT(
 
     if (apiIds !== undefined) {
       await prisma.skillApi.deleteMany({
-        where: { skillId: params.id }
+        where: { skillId: id }
       })
 
       if (apiIds.length > 0) {
         await prisma.skillApi.createMany({
           data: apiIds.map((apiId: string) => ({
-            skillId: params.id,
+            skillId: id,
             apiCredentialId: apiId,
             required: true
           }))
@@ -85,7 +88,7 @@ export async function PUT(
     }
 
     const skillWithRelations = await prisma.skill.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         botSkills: {
           include: {
@@ -109,7 +112,7 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions)
 
@@ -117,9 +120,11 @@ export async function DELETE(
     return new NextResponse("Unauthorized", { status: 401 })
   }
 
+  const { id } = await params
+
   try {
     await prisma.skill.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return new NextResponse(null, { status: 204 })
