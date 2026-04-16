@@ -1,9 +1,10 @@
-import { auth } from "@/lib/auth";
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { BotsList } from "@/components/bots-list";
 
 export default async function BotsPage() {
-  const session = await auth();
+  const session = await getServerSession(authOptions);
 
   if (!session) {
     redirect("/login");
